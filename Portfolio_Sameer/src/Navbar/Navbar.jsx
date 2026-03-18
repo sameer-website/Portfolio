@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { FaGithub, FaLinkedin, FaInstagram } from "react-icons/fa";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -8,8 +9,9 @@ const Navbar = () => {
     <nav className="fixed top-0 w-full z-50 backdrop-blur-md bg-white/10 border-b border-white/20">
       <div className="max-w-7xl mx-auto flex justify-between items-center px-8 py-4">
         {/* Logo */}
-        <div className="text-2xl font-bold bg-linear-to-r from-yellow-400 to-pink-500 bg-clip-text text-transparent">
-          Sameer
+        <div className="text-2xl font-bold tracking-wide text-white">
+          <span className="text-gray-900">Sameer</span>
+          <span className="text-gray-400">.dev</span>
         </div>
 
         {/* Hamburger */}
@@ -62,6 +64,36 @@ const Navbar = () => {
             </Link>
           </li>
         </ul>
+
+        {/* Social Links */}
+        <div className="flex gap-4 text-xl">
+          <a
+            href="https://github.com/sameer-website"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-yellow-400 hover:text-blue-400 transition"
+          >
+            <FaGithub />
+          </a>
+
+          <a
+            href="https://www.linkedin.com/in/sameer-khan-1472832a7"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-400 transition"
+          >
+            <FaLinkedin />
+          </a>
+
+          <a
+            href="https://www.instagram.com/siddiquisameer03?igsh=MTRycWQwZGVtdXFscQ=="
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-pink-600 hover:text-blue-400 transition"
+          >
+            <FaInstagram />
+          </a>
+        </div>
       </div>
     </nav>
   );
