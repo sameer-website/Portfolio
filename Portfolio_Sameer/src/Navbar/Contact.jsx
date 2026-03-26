@@ -69,7 +69,7 @@ function Contact() {
 
     try {
       const response = await fetch(
-        "https://portfolio-23f2.onrender.com/contact",
+        "https://portfolio-server-8whg.onrender.com/contact",
         {
           method: "POST",
           headers: {
