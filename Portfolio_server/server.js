@@ -5,9 +5,11 @@ require("dotenv").config();
 
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
+// Route
 app.post("/contact", async (req, res) => {
   const { name, email, phone, subject, reason, message } = req.body;
 
@@ -20,35 +22,47 @@ app.post("/contact", async (req, res) => {
     message,
   });
 
+  // ✅ Basic validation
+  if (!name || !email || !message) {
+    return res.status(400).json({
+      success: false,
+      message: "Required fields missing",
+    });
+  }
+
   try {
-    //  Transporter (use env variables)
+    // ✅ Transporter
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
+      secure: false,
+      tls: {
+        rejectUnauthorized: false,
+      },
     });
 
-    //  Email to YOU (admin)
+    // ✅ Email to YOU
     const adminMail = {
       from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
       replyTo: email,
-      subject: `New ${reason} Message from ${name}`,
+      subject: `New ${reason || "General"} Message from ${name}`,
       text: `
 Name: ${name}
 Email: ${email}
 Phone: ${phone || "N/A"}
 Subject: ${subject || "N/A"}
-Reason: ${reason}
+Reason: ${reason || "N/A"}
 
 Message:
 ${message}
       `,
     };
 
-    // Auto-reply to USER
+    // ✅ Auto-reply to USER
     const userMail = {
       from: `"Sameer Khan" <${process.env.EMAIL_USER}>`,
       to: email,
@@ -65,7 +79,7 @@ Sameer Khan
       `,
     };
 
-    // Send both emails
+    // ✅ Send emails
     await transporter.sendMail(adminMail);
     await transporter.sendMail(userMail);
 
@@ -83,6 +97,7 @@ Sameer Khan
   }
 });
 
+// ✅ PORT (important for Render)
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, "0.0.0.0", () => {
