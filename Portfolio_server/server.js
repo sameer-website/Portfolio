@@ -97,7 +97,7 @@ Sameer Khan
   }
 });
 
-// ✅ PORT (important for Render)
+//  PORT (important for Render)
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, "0.0.0.0", () => {
