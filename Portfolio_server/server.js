@@ -1,7 +1,8 @@
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
-require("dotenv").config();
 
 const app = express();
 
@@ -13,48 +14,34 @@ app.use(express.json());
 app.post("/contact", async (req, res) => {
   const { name, email, phone, subject, reason, message } = req.body;
 
-  console.log("/contact received", {
-    name,
-    email,
-    phone,
-    subject,
-    reason,
-    message,
-  });
-
-  // ✅ Basic validation
+  // Basic validation
   if (!name || !email || !message) {
     return res.status(400).json({
       success: false,
-      message: "Required fields missing",
+      message: "Name, Email and Message are required",
     });
   }
 
   try {
-    // ✅ Transporter
+    // Gmail transporter
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-      secure: false,
-      tls: {
-        rejectUnauthorized: false,
+        user: process.env.EMAIL_USER, // from Render
+        pass: process.env.EMAIL_PASS, // App Password
       },
     });
 
-    // ✅ Email to YOU
+    // Mail to YOU (admin)
     const adminMail = {
-      from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
+      from: process.env.EMAIL_USER,
       to: process.env.EMAIL_USER,
       replyTo: email,
-      subject: `New ${reason || "General"} Message from ${name}`,
+      subject: subject || "New Contact Message",
       text: `
 Name: ${name}
 Email: ${email}
 Phone: ${phone || "N/A"}
-Subject: ${subject || "N/A"}
 Reason: ${reason || "N/A"}
 
 Message:
@@ -62,44 +49,37 @@ ${message}
       `,
     };
 
-    // ✅ Auto-reply to USER
+    // Auto reply to USER
     const userMail = {
-      from: `"Sameer Khan" <${process.env.EMAIL_USER}>`,
+      from: process.env.EMAIL_USER,
       to: email,
       subject: "Thanks for contacting me",
-      text: `
-Hi ${name},
-
-Thank you for reaching out regarding "${reason || "your query"}".
-
-I have received your message and will get back to you within 24 hours.
-
-Best Regards,
-Sameer Khan
-      `,
+      text: `Hi ${name}, I received your message. I will reply soon.`,
     };
 
-    // ✅ Send emails
+    // Send both emails
     await transporter.sendMail(adminMail);
     await transporter.sendMail(userMail);
 
+    console.log("Email sent");
+
     res.status(200).json({
       success: true,
-      message: "Message Sent Successfully",
+      message: "Message sent successfully",
     });
   } catch (error) {
-    console.error("Email Error:", error);
+    console.error(" Error:", error);
 
     res.status(500).json({
       success: false,
-      message: "Error sending message",
+      message: "Email failed",
     });
   }
 });
 
-//  PORT (important for Render)
+// Server start
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
