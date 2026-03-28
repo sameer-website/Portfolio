@@ -1,85 +1,55 @@
+const express = require("express");
+const nodemailer = require("nodemailer");
+const cors = require("cors");
+const bodyParser = require("body-parser");
 require("dotenv").config();
 
-const express = require("express");
-const cors = require("cors");
-const nodemailer = require("nodemailer");
-
 const app = express();
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
-// Route
+// Test route
+app.get("/", (req, res) => res.send("Backend running!"));
+
+// Contact route
 app.post("/contact", async (req, res) => {
+  console.log("Request received:", req.body);
   const { name, email, phone, subject, reason, message } = req.body;
 
-  // Basic validation
-  if (!name || !email || !message) {
-    return res.status(400).json({
-      success: false,
-      message: "Name, Email and Message are required",
-    });
-  }
+  // Nodemailer transporter
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: process.env.EMAIL_USER, // tumhare email pe hi aa jaye
+    subject: `New Contact Form: ${subject}`,
+    text: `
+      Name: ${name}
+      Email: ${email}
+      Phone: ${phone}
+      Reason: ${reason}
+      Message: ${message}
+    `,
+  };
 
   try {
-    // Gmail transporter
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER, // from Render
-        pass: process.env.EMAIL_PASS, // App Password
-      },
-    });
-
-    // Mail to YOU (admin)
-    const adminMail = {
-      from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_USER,
-      replyTo: email,
-      subject: subject || "New Contact Message",
-      text: `
-Name: ${name}
-Email: ${email}
-Phone: ${phone || "N/A"}
-Reason: ${reason || "N/A"}
-
-Message:
-${message}
-      `,
-    };
-
-    // Auto reply to USER
-    const userMail = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Thanks for contacting me",
-      text: `Hi ${name}, I received your message. I will reply soon.`,
-    };
-
-    // Send both emails
-    await transporter.sendMail(adminMail);
-    await transporter.sendMail(userMail);
-
-    console.log("Email sent");
-
-    res.status(200).json({
-      success: true,
-      message: "Message sent successfully",
-    });
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent:", info.messageId);
+    res.status(200).json({ message: "Message sent successfully" });
   } catch (error) {
-    console.error(" Error:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Email failed",
-    });
+    console.error("Email error:", error);
+    res.status(500).json({ message: "Email failed" });
   }
 });
 
-// Server start
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Start server
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
