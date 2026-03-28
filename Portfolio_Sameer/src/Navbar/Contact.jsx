@@ -70,7 +70,7 @@ function Contact() {
 
     try {
       const response = await fetch(
-        "https://portfolio-server-8whg.onrender.com/contact", // LOCALHOST
+        "https://portfolio-server-8whg.onrender.com/contact",
         {
           method: "POST",
           headers: {
