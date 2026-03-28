@@ -31,6 +31,16 @@ function Projects() {
         "RESTful API with authentication, role-based authorization, and database integration.",
       github: "#",
     },
+    {
+      id: 4,
+      title: "Portfolio Website",
+      category: "Full Stack",
+      tech: ["React", "Tailwind", "Framer Motion"],
+      description:
+        "RESTful API with authentication, role-based authorization, and database integration.",
+      github: "#",
+      link: "https://portfolio-sameer-4k9j.onrender.com",
+    },
   ];
 
   const [selectedCategory, setSelectedCategory] = useState("All");

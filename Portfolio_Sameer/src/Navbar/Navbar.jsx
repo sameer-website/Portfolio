@@ -26,7 +26,7 @@ const Navbar = () => {
         <ul
           className={`md:flex md:space-x-8 font-medium ${
             menuOpen
-              ? "absolute top-16 left-0 w-full bg-black/80 flex flex-col items-center space-y-6 py-6"
+              ? "absolute top-16 left-0 w-full text-white bg-black flex flex-col items-center space-y-6 py-6"
               : "hidden md:flex"
           }`}
         >
